@@ -18,7 +18,7 @@ This package doesn't collect any kind of data, which you can see in the source c
 This is an example code for use:
 
 ``` javascript
-const chatgpt = require('simple-chatgpt-wrapper');
+const chatgpt = require('@ab6162/simple-chatgpt-wrapper');
 
 (async () => {
 
