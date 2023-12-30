@@ -161,7 +161,7 @@ async function sendMessage(message) {
 
     }
 
-    await page.waitFor('.result-streaming');
+    await pageManager.waitFor('.result-streaming');
 
     while (true) {
 
@@ -178,7 +178,7 @@ async function sendMessage(message) {
 
     const elements = await pageManager.$$('.markdown');
 
-    var elementsText = [];
+    let elementsText = [];
 
     for (const element of elements) {
         const elementText = await pageManager.evaluate(

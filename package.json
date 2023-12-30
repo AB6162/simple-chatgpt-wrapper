@@ -1,7 +1,7 @@
 {
   "name": "@ab6162/simple-chatgpt-wrapper",
-  "version": "0.0.1",
-  "description": "A simple npm package to perform requests as a user on the ChatGPT page.",
+  "version": "0.0.2",
+  "description": "A simple npm package to perform requests as a user on the OpenAI ChatGPT page.",
   "main": "index.js",
   "repository": {
     "type": "git",
@@ -14,6 +14,7 @@
   },
   "author": "AB6162",
   "license": "MIT",
+  "private": false,
   "bugs": {
     "url": "https://github.com/ab6162/simple-chatgpt-wrapper/issues"
   },
