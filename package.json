@@ -1,0 +1,30 @@
+{
+  "name": "@ab6162/simple-chatgpt-wrapper",
+  "version": "0.0.1",
+  "description": "A simple npm package to perform requests as a user on the ChatGPT page.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ab6162/simple-chatgpt-wrapper.git"
+  },
+  "dependencies": {
+    "puppeteer": "^21.6.1",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  },
+  "author": "AB6162",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ab6162/simple-chatgpt-wrapper/issues"
+  },
+  "homepage": "https://github.com/ab6162/simple-chatgpt-wrapper#readme",
+  "keywords": [
+    "node.js",
+    "javascript",
+    "npm",
+    "package",
+    "chatgpt",
+    "openai",
+    "ai"
+  ]
+}
