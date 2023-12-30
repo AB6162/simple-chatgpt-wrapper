@@ -161,7 +161,7 @@ async function sendMessage(message) {
 
     }
 
-    await pageManager.waitFor('.result-streaming');
+    await pageManager.waitForSelector('.result-streaming');
 
     while (true) {
 
