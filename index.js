@@ -185,8 +185,6 @@ async function sendMessage(message) {
 
     }
 
-    await pageManager.waitForSelector('.result-streaming', { timeout: 60000 });
-
     while (true) {
 
         try {
