@@ -229,17 +229,8 @@ async function sendMessage(message) {
 
 async function stillLoggedIn() {
 
-    await pageManager.waitForSelector('textarea[id="prompt-textarea"]');
-
-    return true;
-
-}
-
-//revisar captcha
-async function checkCaptcha(page) {
-
     try {
-        await page.waitForSelector('form[id="challenge-form"]');
+        await pageManager.waitForSelector('textarea[id="prompt-textarea"]');
         return true;
     } catch (error) {
         return false;
