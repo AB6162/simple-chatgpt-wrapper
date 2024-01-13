@@ -2,6 +2,9 @@ const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth')
 
 let pageManager = null;
+let browserManager = null;
+let username = null;
+let password = null;
 
 async function login(userName, password) {
 
@@ -71,10 +74,15 @@ async function login(userName, password) {
     );
     login[0].click();
 
+    await waitTimeout(30000);
+
     let statusLogin = await validateLogin(page);
 
     if (statusLogin) {
         pageManager = page;
+        browserManager = browser;
+        username = userName;
+        password = password;
         await waitTimeout(1800);
         return true;
     } else {
@@ -116,7 +124,7 @@ async function sendMessage(message) {
     await pageManager.type(
         'textarea[id="prompt-textarea"]',
         message,
-        { delay: 20 }
+        { delay: 15 }
     );
 
     await waitTimeout(2700);
@@ -161,17 +169,45 @@ async function sendMessage(message) {
 
     }
 
-    await pageManager.waitForSelector('.result-streaming');
+    try {
+
+        await pageManager.waitForSelector('.result-streaming', { timeout: 60000 });
+
+    } catch (error) {
+
+        //close browser
+        await browserManager.close();
+        console.log('Reiniciando navegador');
+        await waitTimeout(3000);
+        //open browser
+        await login(username, password);
+        return false;
+
+    }
+
+    await pageManager.waitForSelector('.result-streaming', { timeout: 60000 });
 
     while (true) {
 
-        pageClicked = await pageManager.evaluate(() => {
-            return !!document.querySelector('.result-streaming')
-        });
+        try {
 
-        if ( (!pageClicked) ) {
-            await waitTimeout(1300);
-            break;
+            pageClicked = await pageManager.evaluate(() => {
+                return !!document.querySelector('.result-streaming')
+            });
+
+            if ( (!pageClicked) ) {
+                await waitTimeout(1300);
+                break;
+            }
+
+        } catch (error) {
+            //close browser
+            await browserManager.close();
+            console.log('Reiniciando navegador');
+            await waitTimeout(3000);
+            //open browser
+            await login(username, password);
+            return false;
         }
 
     }
@@ -191,4 +227,24 @@ async function sendMessage(message) {
 
 }
 
-module.exports = { login, sendMessage };
+async function stillLoggedIn() {
+
+    await pageManager.waitForSelector('textarea[id="prompt-textarea"]');
+
+    return true;
+
+}
+
+//revisar captcha
+async function checkCaptcha(page) {
+
+    try {
+        await page.waitForSelector('form[id="challenge-form"]');
+        return true;
+    } catch (error) {
+        return false;
+    }
+
+}
+
+module.exports = { login, sendMessage, stillLoggedIn };
