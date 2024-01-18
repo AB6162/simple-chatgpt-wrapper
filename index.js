@@ -4,7 +4,7 @@ const StealthPlugin = require('puppeteer-extra-plugin-stealth')
 let pageManager = null;
 let browserManager = null;
 let username = null;
-let password = null;
+let passw = null;
 
 async function login(userName, password) {
 
@@ -15,7 +15,10 @@ async function login(userName, password) {
             headless: false,
         }
     );
-    const page = await browser.newPage();
+
+    const context = await browser.createIncognitoBrowserContext();
+
+    const page = await context.newPage();
     await page.goto('https://chat.openai.com/auth/login');
 
     await waitTimeout(2200);
@@ -82,7 +85,7 @@ async function login(userName, password) {
         pageManager = page;
         browserManager = browser;
         username = userName;
-        password = password;
+        passw = password;
         await waitTimeout(1800);
         return true;
     } else {
@@ -180,7 +183,7 @@ async function sendMessage(message) {
         console.log('Reiniciando navegador');
         await waitTimeout(3000);
         //open browser
-        await login(username, password);
+        await login(username, passw);
         return false;
 
     }
@@ -204,7 +207,7 @@ async function sendMessage(message) {
             console.log('Reiniciando navegador');
             await waitTimeout(3000);
             //open browser
-            await login(username, password);
+            await login(username, passw);
             return false;
         }
 
