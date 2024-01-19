@@ -122,6 +122,82 @@ async function validateLogin(page) {
 
 }
 
+async function hasInternet() {
+
+    try {
+
+        const response = await fetch('https://www.google.com');
+        return true;
+
+    } catch (error) {
+
+        return false;
+
+    }
+
+}
+
+async function checkErrorNetwork() {
+
+    var networkError = false;
+
+    networkError = await pageManager.evaluate(() => {
+        return (document.evaluate('//div[@class="flex-1 overflow-hidden"]//div[p]', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.attributes.class.nodeValue).includes('text-red');
+    });
+
+    if (networkError) {
+
+        //init ping
+        let ping = await hasInternet();
+
+        let retries = 0;
+
+        while (!ping) {
+
+            if (retries > 12) {
+                break;
+            }
+
+            retries++;
+
+            console.log('Probando conexión a internet');
+            ping = await hasInternet();
+
+            if (ping) {
+                break;
+            }
+
+            await waitTimeout(10000);
+
+        }
+
+        if (!ping) {
+            return false;
+        }
+
+        try {
+
+            let regenerate_btn = await pageManager.$x(
+                '//*[@id="__next"]/div[1]/div[2]/main/div[2]/div[2]/div[1]/div[2]/button'
+            );
+
+            regenerate_btn[0].click();
+
+            return true;
+
+        } catch (error) {
+
+            console.log('Fail to regenerate');
+            return false;
+
+        }
+
+    } else {
+        return false;
+    }
+
+}
+
 async function sendMessage(message) {
 
     await pageManager.type(
@@ -178,15 +254,16 @@ async function sendMessage(message) {
 
     } catch (error) {
 
-        //close browser
-        await browserManager.close();
-        console.log('Reiniciando navegador');
-        await waitTimeout(3000);
-        //open browser
-        await login(username, passw);
-        return false;
+        let status_network = await checkErrorNetwork();
+
+        if (!status_network) {
+            await browserManager.close();
+            return false;
+        }
 
     }
+
+    let retries_network = 0;
 
     while (true) {
 
@@ -202,13 +279,16 @@ async function sendMessage(message) {
             }
 
         } catch (error) {
-            //close browser
-            await browserManager.close();
-            console.log('Reiniciando navegador');
-            await waitTimeout(3000);
-            //open browser
-            await login(username, passw);
-            return false;
+
+            if (retries_network > 2) {
+                await browserManager.close();
+                return false;
+            }
+
+            let status_network = await checkErrorNetwork();
+
+            retries_network++;
+
         }
 
     }
