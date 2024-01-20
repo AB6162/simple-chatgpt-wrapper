@@ -16,9 +16,9 @@ async function login(userName, password) {
         }
     );
 
-    const context = await browser.createIncognitoBrowserContext();
+    //const context = await browser.createIncognitoBrowserContext();
 
-    const page = await context.newPage();
+    const page = await browser.newPage();
     await page.goto('https://chat.openai.com/auth/login');
 
     await waitTimeout(2200);
@@ -193,6 +193,7 @@ async function checkErrorNetwork() {
         }
 
     } else {
+        console.log('No error element found');
         return false;
     }
 
@@ -200,12 +201,16 @@ async function checkErrorNetwork() {
 
 async function sendMessage(message) {
 
+    /*
     await pageManager.type(
         'textarea[id="prompt-textarea"]',
         message
     );
+    */
 
-    await waitTimeout(2700);
+    await pageManager.keyboard.type(message);
+
+    await waitTimeout(1700);
 
     //await pageManager.keyboard.press('Enter');
 
@@ -240,7 +245,7 @@ async function sendMessage(message) {
                 submit_msg[0].click();
 
             } catch (error) {
-
+                console.log('Fail to send message');
             }
 
         }
@@ -256,7 +261,7 @@ async function sendMessage(message) {
         let status_network = await checkErrorNetwork();
 
         if (!status_network) {
-            console.log('Network error');
+            console.log('Network error waiting for selector');
             await browserManager.close();
             return false;
         }
@@ -281,7 +286,7 @@ async function sendMessage(message) {
         } catch (error) {
 
             if (retries_network > 2) {
-                console.log('Network error');
+                console.log('Network error waiting for response');
                 await browserManager.close();
                 return false;
             }
