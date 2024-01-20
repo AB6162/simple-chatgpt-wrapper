@@ -208,7 +208,8 @@ async function sendMessage(message) {
     );
     */
 
-    await pageManager.keyboard.type(message);
+    //await pageManager.keyboard.type(message);
+    await page.$eval('textarea[id="prompt-textarea"]', (el, value) => el.value = value, message);
 
     await waitTimeout(1700);
 
