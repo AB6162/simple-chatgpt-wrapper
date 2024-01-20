@@ -202,8 +202,7 @@ async function sendMessage(message) {
 
     await pageManager.type(
         'textarea[id="prompt-textarea"]',
-        message,
-        { delay: 15 }
+        message
     );
 
     await waitTimeout(2700);
@@ -257,6 +256,7 @@ async function sendMessage(message) {
         let status_network = await checkErrorNetwork();
 
         if (!status_network) {
+            console.log('Network error');
             await browserManager.close();
             return false;
         }
@@ -281,6 +281,7 @@ async function sendMessage(message) {
         } catch (error) {
 
             if (retries_network > 2) {
+                console.log('Network error');
                 await browserManager.close();
                 return false;
             }
