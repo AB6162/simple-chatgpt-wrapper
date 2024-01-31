@@ -67,13 +67,15 @@ async function login(userName, password) {
     await page.type('input[name="password"]', password, { delay: 150 });
 
     await page.waitForXPath(
-        '/html/body/div[1]/main/section/div/div/div/form/div[3]/button'
+        '/html/body/div[1]/main/section/div/div/div/form/div[2]/button'
     );
 
     await waitTimeout(1700);
 
+    ///html/body/div[1]/main/section/div/div/div/form/div[2]/button
+
     let login = await page.$x(
-        '/html/body/div[1]/main/section/div/div/div/form/div[3]/button'
+        '/html/body/div[1]/main/section/div/div/div/form/div[2]/button'
     );
     login[0].click();
 
@@ -142,7 +144,11 @@ async function checkErrorNetwork() {
     var networkError = false;
 
     networkError = await pageManager.evaluate(() => {
-        return (document.evaluate('//div[@class="flex-1 overflow-hidden"]//div[p]', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.attributes.class.nodeValue).includes('text-red');
+        try {
+            return (document.evaluate('//div[@class="flex-1 overflow-hidden"]//div[p]', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.attributes.class.nodeValue).includes('text-red');
+        } catch (error) {
+            return false;
+        }
     });
 
     if (networkError) {
@@ -194,7 +200,7 @@ async function checkErrorNetwork() {
 
     } else {
         console.log('No error element found');
-        return false;
+        return 'NO_ELEMENT';
     }
 
 }
@@ -210,6 +216,13 @@ async function sendMessage(message) {
 
     //await pageManager.keyboard.type(message);
     await pageManager.$eval('textarea[id="prompt-textarea"]', (el, value) => el.value = value, message);
+
+    await waitTimeout(1200);
+
+    await pageManager.type(
+        'textarea[id="prompt-textarea"]',
+        ' '
+    );
 
     await waitTimeout(1700);
 
@@ -261,10 +274,68 @@ async function sendMessage(message) {
 
         let status_network = await checkErrorNetwork();
 
-        if (!status_network) {
+        if (status_network === false) {
             console.log('Network error waiting for selector');
             await browserManager.close();
             return false;
+        } else if (status_network === 'NO_ELEMENT') {
+
+            await pageManager.reload();
+
+            try {
+
+                await pageManager.waitForSelector('textarea[id="prompt-textarea"]', { timeout: 30000 });
+
+                await pageManager.$eval('textarea[id="prompt-textarea"]', (el, value) => el.value = value, message);
+
+                await waitTimeout(1200);
+
+                await pageManager.type(
+                    'textarea[id="prompt-textarea"]',
+                    ' '
+                );
+
+                try {
+
+                    let submit_msg = await pageManager.$x(
+                        '//*[@id="__next"]/div[1]/div[2]/main/div[2]/div[2]/form/div/div[2]/div/button'
+                    );
+
+                    submit_msg[0].click();
+
+                } catch (error) {
+
+                    try {
+
+                        let submit_msg = await pageManager.$x(
+                            '//*[@id="__next"]/div[1]/div/main/div[1]/div[2]/form/div/div/div/button'
+                        );
+
+                        submit_msg[0].click();
+
+                    } catch (error) {
+
+                        try {
+
+                            let submit_msg = await pageManager.$x(
+                                '//*[@id="__next"]/div[1]/div[2]/main/div[2]/div[2]/form/div/div/div/button'
+                            );
+
+                            submit_msg[0].click();
+
+                        } catch (error) {
+                            console.log('Fail to send message');
+                        }
+
+                    }
+
+                }
+
+            } catch (error) {
+                console.log('Fail to reload page '+error);
+                return false;
+            }
+
         }
 
     }
@@ -293,6 +364,70 @@ async function sendMessage(message) {
             }
 
             let status_network = await checkErrorNetwork();
+
+            if (status_network === false) {
+
+                continue;
+
+            } else if (status_network === 'NO_ELEMENT') {
+
+                await pageManager.reload();
+
+                try {
+
+                    await pageManager.waitForSelector('textarea[id="prompt-textarea"]', { timeout: 30000 });
+
+                    await pageManager.$eval('textarea[id="prompt-textarea"]', (el, value) => el.value = value, message);
+
+                    await waitTimeout(1200);
+
+                    await pageManager.type(
+                        'textarea[id="prompt-textarea"]',
+                        ' '
+                    );
+
+                    try {
+
+                        let submit_msg = await pageManager.$x(
+                            '//*[@id="__next"]/div[1]/div[2]/main/div[2]/div[2]/form/div/div[2]/div/button'
+                        );
+
+                        submit_msg[0].click();
+
+                    } catch (error) {
+
+                        try {
+
+                            let submit_msg = await pageManager.$x(
+                                '//*[@id="__next"]/div[1]/div/main/div[1]/div[2]/form/div/div/div/button'
+                            );
+
+                            submit_msg[0].click();
+
+                        } catch (error) {
+
+                            try {
+
+                                let submit_msg = await pageManager.$x(
+                                    '//*[@id="__next"]/div[1]/div[2]/main/div[2]/div[2]/form/div/div/div/button'
+                                );
+
+                                submit_msg[0].click();
+
+                            } catch (error) {
+                                console.log('Fail to send message');
+                            }
+
+                        }
+
+                    }
+
+                } catch (error) {
+                    console.log('Fail to reload page '+error);
+                    return false;
+                }
+
+            }
 
             retries_network++;
 
