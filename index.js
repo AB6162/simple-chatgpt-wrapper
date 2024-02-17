@@ -5,6 +5,7 @@ let pageManager = null;
 let browserManager = null;
 let username = null;
 let passw = null;
+let prompt_uses = 0;
 
 async function login(userName, password) {
 
@@ -213,6 +214,23 @@ async function sendMessage(message) {
         message
     );
     */
+
+    if (prompt_uses >= 50) {
+
+        await pageManager.reload();
+
+        try {
+
+            await pageManager.waitForSelector('textarea[id="prompt-textarea"]', { timeout: 30000 });
+
+            prompt_uses = 0;
+
+        } catch (error) {
+            console.log('Fail to reload page '+error);
+            return false;
+        }
+
+    }
 
     //await pageManager.keyboard.type(message);
     await pageManager.$eval('textarea[id="prompt-textarea"]', (el, value) => el.value = value, message);
@@ -499,6 +517,10 @@ async function sendMessage(message) {
             element => element.textContent, element
         );
         elementsText.push(elementText);
+    }
+
+    if (elements.length > 0) {
+        prompt_uses++;
     }
 
     return elementsText[elementsText.length - 1];
