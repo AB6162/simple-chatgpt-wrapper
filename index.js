@@ -275,9 +275,65 @@ async function sendMessage(message) {
         let status_network = await checkErrorNetwork();
 
         if (status_network === false) {
-            console.log('Network error waiting for selector');
-            await browserManager.close();
-            return false;
+
+            console.log('Rated limit reached, waiting 10 minutes to continue.');
+            await waitTimeout(600000);
+            await pageManager.reload();
+
+            try {
+
+                await pageManager.waitForSelector('textarea[id="prompt-textarea"]', { timeout: 30000 });
+
+                await pageManager.$eval('textarea[id="prompt-textarea"]', (el, value) => el.value = value, message);
+
+                await waitTimeout(1200);
+
+                await pageManager.type(
+                    'textarea[id="prompt-textarea"]',
+                    ' '
+                );
+
+                try {
+
+                    let submit_msg = await pageManager.$x(
+                        '//*[@id="__next"]/div[1]/div[2]/main/div[2]/div[2]/form/div/div[2]/div/button'
+                    );
+
+                    submit_msg[0].click();
+
+                } catch (error) {
+
+                    try {
+
+                        let submit_msg = await pageManager.$x(
+                            '//*[@id="__next"]/div[1]/div/main/div[1]/div[2]/form/div/div/div/button'
+                        );
+
+                        submit_msg[0].click();
+
+                    } catch (error) {
+
+                        try {
+
+                            let submit_msg = await pageManager.$x(
+                                '//*[@id="__next"]/div[1]/div[2]/main/div[2]/div[2]/form/div/div/div/button'
+                            );
+
+                            submit_msg[0].click();
+
+                        } catch (error) {
+                            console.log('Fail to send message');
+                        }
+
+                    }
+
+                }
+
+            } catch (error) {
+                console.log('Fail to reload page '+error);
+                return false;
+            }
+
         } else if (status_network === 'NO_ELEMENT') {
 
             await pageManager.reload();
@@ -358,9 +414,8 @@ async function sendMessage(message) {
         } catch (error) {
 
             if (retries_network > 2) {
-                console.log('Network error waiting for response');
-                await browserManager.close();
-                return false;
+                console.log('Rated limit reached, waiting 10 minutes to continue.');
+                await waitTimeout(600000);
             }
 
             let status_network = await checkErrorNetwork();
