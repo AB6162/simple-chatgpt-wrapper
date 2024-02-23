@@ -48,9 +48,9 @@ async function login(userName, password) {
 
     }
 
-    await page.waitForSelector('input[name="username"]');
+    await page.waitForSelector('input[name="email"]');
 
-    await page.type('input[name="username"]', userName, { delay: 150 });
+    await page.type('input[name="email"]', userName, { delay: 150 });
 
     await page.waitForXPath(
         '/html/body/div/main/section/div/div/div/div[1]/div/form/div[2]/button'
