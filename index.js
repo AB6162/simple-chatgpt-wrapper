@@ -48,20 +48,55 @@ async function login(userName, password) {
 
     }
 
-    await page.waitForSelector('input[name="email"]');
+    try {
 
-    await page.type('input[name="email"]', userName, { delay: 150 });
+        await page.waitForSelector('input[name="email"]');
 
-    await page.waitForXPath(
-        '/html/body/div/main/section/div/div/div/div[1]/div/form/div[2]/button'
-    );
+        await page.click('input[name="email"]');
 
-    await waitTimeout(1700);
+        await page.type('input[name="email"]', userName, { delay: 150 });
 
-    let continueLogin = await page.$x(
-        '/html/body/div/main/section/div/div/div/div[1]/div/form/div[2]/button'
-    );
-    continueLogin[0].click();
+    } catch (error) {
+
+        console.log('Fail to type email');
+
+        try {
+
+            await page.waitForSelector('input[name="username"]');
+
+            await page.click('input[name="username"]');
+
+            await page.type('input[name="username"]', userName, { delay: 150 });
+
+        } catch (error) {
+            console.log('Fail to type username');
+        }
+
+    }
+
+    try {
+        await page.waitForSelector('button.continue-btn')
+        await page.click('button.continue-btn');
+    } catch (error) {
+        console.log('Fail to click continue');
+    }
+
+    try {
+
+        await page.waitForXPath(
+            '/html/body/div/main/section/div/div/div/div[1]/div/form/div[2]/button'
+        );
+
+        await waitTimeout(1700);
+
+        let continueLogin = await page.$x(
+            '/html/body/div/main/section/div/div/div/div[1]/div/form/div[2]/button'
+        );
+        continueLogin[0].click();
+
+    } catch (error) {
+        console.log('Fail to click continue 2');
+    }
 
     await page.waitForSelector('input[name="password"]');
 
@@ -538,4 +573,20 @@ async function stillLoggedIn() {
 
 }
 
-module.exports = { login, sendMessage, stillLoggedIn };
+async function destroy() {
+
+    try {
+        await pageManager.close();
+    } catch (error) {
+        console.log('Error on destroy tab');
+    }
+
+    try {
+        await browserManager.close();
+    } catch (error) {
+        console.log('Error on destroy');
+    }
+
+}
+
+module.exports = { login, sendMessage, stillLoggedIn, destroy };
