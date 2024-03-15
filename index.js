@@ -267,15 +267,44 @@ async function sendMessage(message) {
 
     }
 
-    //await pageManager.keyboard.type(message);
-    await pageManager.$eval('textarea[id="prompt-textarea"]', (el, value) => el.value = value, message);
+    ////*[@id="__next"]/div[1]/div/main/div[1]/div[2]/div[1]/div[2]/button/div
+    ///html/body/div[1]/div[1]/div/main/div[1]/div[2]/div[1]/div[2]/button/div
 
-    await waitTimeout(1200);
+    try {
 
-    await pageManager.type(
-        'textarea[id="prompt-textarea"]',
-        ' '
-    );
+        //await pageManager.keyboard.type(message);
+        await pageManager.$eval('textarea[id="prompt-textarea"]', (el, value) => el.value = value, message);
+
+        await waitTimeout(1200);
+
+        await pageManager.type(
+            'textarea[id="prompt-textarea"]',
+            ' '
+        );
+
+    } catch (error) {
+        console.log('Rate limited');
+        await waitTimeout(3600000);
+        await pageManager.reload();
+    }
+
+    await waitTimeout(2200);
+
+    try {
+
+        //await pageManager.keyboard.type(message);
+        await pageManager.$eval('textarea[id="prompt-textarea"]', (el, value) => el.value = value, message);
+
+        await waitTimeout(1200);
+
+        await pageManager.type(
+            'textarea[id="prompt-textarea"]',
+            ' '
+        );
+
+    } catch (error) {
+        return false;
+    }
 
     await waitTimeout(1700);
 
