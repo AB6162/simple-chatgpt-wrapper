@@ -24,12 +24,33 @@ async function login(userName, password) {
 
     await waitTimeout(2200);
 
-    const btnLogin = await page.waitForXPath(
-        '//*[@id="__next"]/div[1]/div[2]/div[1]/div/div/button[1]'
-    );
+    try {
 
-    if (btnLogin) {
-        btnLogin.click();
+        const btnLogin = await page.waitForXPath(
+            '//*[@id="__next"]/div[1]/div[2]/div[1]/div/div/button[1]'
+        );
+
+        if (btnLogin) {
+            btnLogin.click();
+        }
+
+    } catch (error) {
+
+        try {
+
+            const btnLogin = await page.waitForXPath(
+                '//*[@id="__next"]/div[1]/div[1]/div/div/div/div/nav/div[2]/div[2]/button[2]'
+            );
+
+            if (btnLogin) {
+                btnLogin.click();
+            }
+
+        } catch (error) {
+            console.log('Error iniciando sesión');
+            return;
+        }
+
     }
 
     let statusCloudflare = await checkCloudflare(page);
@@ -315,7 +336,7 @@ async function sendMessage(message) {
     try {
 
         let submit_msg = await pageManager.$x(
-            '//*[@id="__next"]/div[1]/div[2]/main/div[2]/div[2]/form/div/div[2]/div/button'
+            '//*[@id="__next"]/div[1]/div/main/div[1]/div[2]/div[1]/div/form/div/div[2]/div/button'
         );
 
         submit_msg[0].click();
@@ -378,7 +399,7 @@ async function sendMessage(message) {
                 try {
 
                     let submit_msg = await pageManager.$x(
-                        '//*[@id="__next"]/div[1]/div[2]/main/div[2]/div[2]/form/div/div[2]/div/button'
+                        '//*[@id="__next"]/div[1]/div/main/div[1]/div[2]/div[1]/div/form/div/div[2]/div/button'
                     );
 
                     submit_msg[0].click();
@@ -436,7 +457,7 @@ async function sendMessage(message) {
                 try {
 
                     let submit_msg = await pageManager.$x(
-                        '//*[@id="__next"]/div[1]/div[2]/main/div[2]/div[2]/form/div/div[2]/div/button'
+                        '//*[@id="__next"]/div[1]/div/main/div[1]/div[2]/div[1]/div/form/div/div[2]/div/button'
                     );
 
                     submit_msg[0].click();
