@@ -26,6 +26,36 @@ async function login(userName, password) {
 
     try {
 
+        const btnModal = await page.waitForXPath(
+            '//*[@id="radix-:r7:"]/div/div/a'
+        );
+
+        if (btnModal) {
+            btnModal.click();
+        }
+
+    } catch (error) {
+        console.log('Error click modal');
+    }
+
+    await waitTimeout(1500);
+
+    try {
+
+        const btnLogin = await page.waitForXPath(
+            '//*[@id="root"]/div/main/section/div[2]/p/a'
+        );
+
+        if (btnLogin) {
+            btnLogin.click();
+        }
+
+    } catch (error) {
+        console.log('Error click go login');
+    }
+
+    try {
+
         const btnLogin = await page.waitForXPath(
             '//*[@id="__next"]/div[1]/div[2]/div[1]/div/div/button[1]'
         );
@@ -48,7 +78,6 @@ async function login(userName, password) {
 
         } catch (error) {
             console.log('Error iniciando sesión');
-            return;
         }
 
     }
@@ -291,6 +320,14 @@ async function sendMessage(message) {
     ////*[@id="__next"]/div[1]/div/main/div[1]/div[2]/div[1]/div[2]/button/div
     ///html/body/div[1]/div[1]/div/main/div[1]/div[2]/div[1]/div[2]/button/div
 
+    ////*[@id="__next"]/div[1]/div[2]/main/div[2]/div[2]/div[1]/div/form/div/div[2]/div/button
+
+    ////*[@id="__next"]/div[1]/div[2]/main/div[2]/div[2]/div[1]/div/form/div/div[2]/div/button
+
+    ////*[@id="__next"]/div[1]/div[2]/main/div[1]/div[2]/div[1]/div/form/div/div[2]/div/div/button
+
+    ////*[@id="__next"]/div[1]/div[2]/main/div[2]/div[2]/div[1]/div/form/div/div[2]/div/button
+
     try {
 
         //await pageManager.keyboard.type(message);
@@ -336,7 +373,7 @@ async function sendMessage(message) {
     try {
 
         let submit_msg = await pageManager.$x(
-            '//*[@id="__next"]/div[1]/div/main/div[1]/div[2]/div[1]/div/form/div/div[2]/div/button'
+            '//*[@id="__next"]/div[1]/div[2]/main/div[2]/div[2]/div[1]/div/form/div/div[2]/div/button'
         );
 
         submit_msg[0].click();
@@ -362,7 +399,19 @@ async function sendMessage(message) {
                 submit_msg[0].click();
 
             } catch (error) {
-                console.log('Fail to send message');
+
+                try {
+
+                    let submit_msg = await pageManager.$x(
+                        '//*[@id="__next"]/div[1]/div[2]/main/div[1]/div[2]/div[1]/div/form/div/div[2]/div/div/button'
+                    );
+
+                    submit_msg[0].click();
+
+                } catch (error) {
+                    console.log('Fail to send message');
+                }
+
             }
 
         }
@@ -399,7 +448,7 @@ async function sendMessage(message) {
                 try {
 
                     let submit_msg = await pageManager.$x(
-                        '//*[@id="__next"]/div[1]/div/main/div[1]/div[2]/div[1]/div/form/div/div[2]/div/button'
+                        '//*[@id="__next"]/div[1]/div[2]/main/div[2]/div[2]/div[1]/div/form/div/div[2]/div/button'
                     );
 
                     submit_msg[0].click();
@@ -425,7 +474,19 @@ async function sendMessage(message) {
                             submit_msg[0].click();
 
                         } catch (error) {
-                            console.log('Fail to send message');
+
+                            try {
+
+                                let submit_msg = await pageManager.$x(
+                                    '//*[@id="__next"]/div[1]/div[2]/main/div[1]/div[2]/div[1]/div/form/div/div[2]/div/div/button'
+                                );
+
+                                submit_msg[0].click();
+
+                            } catch (error) {
+                                console.log('Fail to send message');
+                            }
+
                         }
 
                     }
@@ -457,7 +518,7 @@ async function sendMessage(message) {
                 try {
 
                     let submit_msg = await pageManager.$x(
-                        '//*[@id="__next"]/div[1]/div/main/div[1]/div[2]/div[1]/div/form/div/div[2]/div/button'
+                        '//*[@id="__next"]/div[1]/div[2]/main/div[2]/div[2]/div[1]/div/form/div/div[2]/div/button'
                     );
 
                     submit_msg[0].click();
@@ -483,7 +544,19 @@ async function sendMessage(message) {
                             submit_msg[0].click();
 
                         } catch (error) {
-                            console.log('Fail to send message');
+
+                            try {
+
+                                let submit_msg = await pageManager.$x(
+                                    '//*[@id="__next"]/div[1]/div[2]/main/div[1]/div[2]/div[1]/div/form/div/div[2]/div/div/button'
+                                );
+
+                                submit_msg[0].click();
+
+                            } catch (error) {
+                                console.log('Fail to send message');
+                            }
+
                         }
 
                     }
@@ -547,6 +620,20 @@ async function sendMessage(message) {
                     try {
 
                         let submit_msg = await pageManager.$x(
+                            '//*[@id="__next"]/div[1]/div[2]/main/div[2]/div[2]/div[1]/div/form/div/div[2]/div/button'
+                        );
+
+                        submit_msg[0].click();
+
+                    } catch (error) {
+
+                        console.log('Fail to send message 1');
+
+                    }
+
+                    try {
+
+                        let submit_msg = await pageManager.$x(
                             '//*[@id="__next"]/div[1]/div[2]/main/div[2]/div[2]/form/div/div[2]/div/button'
                         );
 
@@ -573,7 +660,19 @@ async function sendMessage(message) {
                                 submit_msg[0].click();
 
                             } catch (error) {
-                                console.log('Fail to send message');
+
+                                try {
+
+                                    let submit_msg = await pageManager.$x(
+                                        '//*[@id="__next"]/div[1]/div[2]/main/div[1]/div[2]/div[1]/div/form/div/div[2]/div/div/button'
+                                    );
+
+                                    submit_msg[0].click();
+
+                                } catch (error) {
+                                    console.log('Fail to send message');
+                                }
+
                             }
 
                         }
