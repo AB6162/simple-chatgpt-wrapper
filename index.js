@@ -22,6 +22,8 @@ async function login(userName, password) {
     const page = await browser.newPage();
     await page.goto('https://chat.openai.com/auth/login');
 
+    //*[@id="__next"]/div[1]/div[1]/div/div/div/div/nav/div[2]/div[2]/button[2]
+
     await waitTimeout(2200);
 
     try {
@@ -46,8 +48,12 @@ async function login(userName, password) {
             '//*[@id="root"]/div/main/section/div[2]/p/a'
         );
 
-        if (btnLogin) {
-            btnLogin.click();
+        if (btnLogin.textContent === 'Login') {
+
+            if (btnLogin) {
+                btnLogin.click();
+            }
+
         }
 
     } catch (error) {
@@ -77,7 +83,23 @@ async function login(userName, password) {
             }
 
         } catch (error) {
-            console.log('Error iniciando sesión');
+
+            try {
+
+                const btnLogin = await page.waitForXPath(
+                    '//*[@id="root"]/div/main/section/div[2]/p/a'
+                );
+
+                if (btnLogin.textContent === 'Login') {
+                    if (btnLogin) {
+                        btnLogin.click();
+                    }
+                }
+
+            }  catch (error) {
+                console.log('Error click login');
+            }
+
         }
 
     }
