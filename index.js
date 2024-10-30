@@ -7,28 +7,24 @@ let username = null;
 let passw = null;
 let prompt_uses = 0;
 
-async function login(userName, password) {
+async function login(userName, password, headless = false) {
 
     puppeteer.use(StealthPlugin())
 
     const browser = await puppeteer.launch(
         {
-            headless: false,
+            headless: headless,
         }
     );
-
-    //const context = await browser.createIncognitoBrowserContext();
 
     const page = await browser.newPage();
     await page.goto('https://chat.openai.com/auth/login');
 
-    //*[@id="__next"]/div[1]/div[1]/div/div/div/div/nav/div[2]/div[2]/button[2]
-
-    await waitTimeout(2200);
+    await waitTimeout(1000);
 
     try {
 
-        const btnModal = await page.waitForXPath(
+        const btnModal = await page.waitForSelector(
             '//*[@id="radix-:r7:"]/div/div/a'
         );
 
@@ -40,67 +36,18 @@ async function login(userName, password) {
         console.log('Error click modal');
     }
 
-    await waitTimeout(1500);
+    await waitTimeout(1000);
 
     try {
 
-        const btnLogin = await page.waitForXPath(
-            '//*[@id="root"]/div/main/section/div[2]/p/a'
-        );
+        await page.waitForSelector('[data-testid="login-button"]');
 
-        if (btnLogin.textContent === 'Login') {
+        await page.click('[data-testid="login-button"]');
 
-            if (btnLogin) {
-                btnLogin.click();
-            }
-
-        }
-
-    } catch (error) {
-        console.log('Error click go login');
-    }
-
-    try {
-
-        const btnLogin = await page.waitForXPath(
-            '//*[@id="__next"]/div[1]/div[2]/div[1]/div/div/button[1]'
-        );
-
-        if (btnLogin) {
-            btnLogin.click();
-        }
 
     } catch (error) {
 
-        try {
-
-            const btnLogin = await page.waitForXPath(
-                '//*[@id="__next"]/div[1]/div[1]/div/div/div/div/nav/div[2]/div[2]/button[2]'
-            );
-
-            if (btnLogin) {
-                btnLogin.click();
-            }
-
-        } catch (error) {
-
-            try {
-
-                const btnLogin = await page.waitForXPath(
-                    '//*[@id="root"]/div/main/section/div[2]/p/a'
-                );
-
-                if (btnLogin.textContent === 'Login') {
-                    if (btnLogin) {
-                        btnLogin.click();
-                    }
-                }
-
-            }  catch (error) {
-                console.log('Error click login');
-            }
-
-        }
+        return false;
 
     }
 
@@ -112,7 +59,7 @@ async function login(userName, password) {
 
             console.log('Cloudflare detected!');
 
-            await waitTimeout(3000);
+            await waitTimeout(1500);
 
             statusCloudflare = await checkCloudflare(page);
 
@@ -130,8 +77,6 @@ async function login(userName, password) {
 
     } catch (error) {
 
-        console.log('Fail to type email');
-
         try {
 
             await page.waitForSelector('input[name="username"]');
@@ -142,6 +87,7 @@ async function login(userName, password) {
 
         } catch (error) {
             console.log('Fail to type username');
+            return false;
         }
 
     }
@@ -155,15 +101,16 @@ async function login(userName, password) {
 
     try {
 
-        await page.waitForXPath(
+        await page.waitForSelector(
             '/html/body/div/main/section/div/div/div/div[1]/div/form/div[2]/button'
         );
 
-        await waitTimeout(1700);
+        await waitTimeout(1000);
 
-        let continueLogin = await page.$x(
+        let continueLogin = await page.$$(
             '/html/body/div/main/section/div/div/div/div[1]/div/form/div[2]/button'
         );
+
         continueLogin[0].click();
 
     } catch (error) {
@@ -174,20 +121,11 @@ async function login(userName, password) {
 
     await page.type('input[name="password"]', password, { delay: 150 });
 
-    await page.waitForXPath(
-        '/html/body/div[1]/main/section/div/div/div/form/div[2]/button'
-    );
+    await page.waitForSelector('button._button-login-password[data-action-button-primary="true"]');
 
-    await waitTimeout(1700);
+    await page.click('button._button-login-password[data-action-button-primary="true"]');
 
-    ///html/body/div[1]/main/section/div/div/div/form/div[2]/button
-
-    let login = await page.$x(
-        '/html/body/div[1]/main/section/div/div/div/form/div[2]/button'
-    );
-    login[0].click();
-
-    await waitTimeout(30000);
+    await waitTimeout(4500);
 
     let statusLogin = await validateLogin(page);
 
@@ -196,7 +134,7 @@ async function login(userName, password) {
         browserManager = browser;
         username = userName;
         passw = password;
-        await waitTimeout(1800);
+        await waitTimeout(1000);
         return true;
     } else {
         return null;
@@ -206,7 +144,7 @@ async function login(userName, password) {
 
 async function waitTimeout(time) {
 
-    await new Promise(resolve => setTimeout(resolve, time));
+    return await new Promise(resolve => setTimeout(resolve, time));
 
 }
 
@@ -224,7 +162,7 @@ async function checkCloudflare(page) {
 async function validateLogin(page) {
 
     try {
-        await page.waitForSelector('textarea[id="prompt-textarea"]');
+        await page.waitForSelector('div[id="prompt-textarea"]');
         return true;
     } catch (error) {
         return false;
@@ -315,20 +253,13 @@ async function checkErrorNetwork() {
 
 async function sendMessage(message) {
 
-    /*
-    await pageManager.type(
-        'textarea[id="prompt-textarea"]',
-        message
-    );
-    */
-
     if (prompt_uses >= 50) {
 
         await pageManager.reload();
 
         try {
 
-            await pageManager.waitForSelector('textarea[id="prompt-textarea"]', { timeout: 30000 });
+            await pageManager.waitForSelector('div[id="prompt-textarea"]', { timeout: 30000 });
 
             prompt_uses = 0;
 
@@ -339,28 +270,12 @@ async function sendMessage(message) {
 
     }
 
-    ////*[@id="__next"]/div[1]/div/main/div[1]/div[2]/div[1]/div[2]/button/div
-    ///html/body/div[1]/div[1]/div/main/div[1]/div[2]/div[1]/div[2]/button/div
-
-    ////*[@id="__next"]/div[1]/div[2]/main/div[2]/div[2]/div[1]/div/form/div/div[2]/div/button
-
-    ////*[@id="__next"]/div[1]/div[2]/main/div[2]/div[2]/div[1]/div/form/div/div[2]/div/button
-
-    ////*[@id="__next"]/div[1]/div[2]/main/div[1]/div[2]/div[1]/div/form/div/div[2]/div/div/button
-
-    ////*[@id="__next"]/div[1]/div[2]/main/div[2]/div[2]/div[1]/div/form/div/div[2]/div/button
-
     try {
 
-        //await pageManager.keyboard.type(message);
-        await pageManager.$eval('textarea[id="prompt-textarea"]', (el, value) => el.value = value, message);
-
-        await waitTimeout(1200);
-
-        await pageManager.type(
-            'textarea[id="prompt-textarea"]',
-            ' '
-        );
+        await pageManager.evaluate((message) => {
+            const element = document.getElementById('prompt-textarea');
+            element.innerHTML = `<p>${message}</p>`;
+        }, message);
 
     } catch (error) {
         console.log('Rate limited');
@@ -370,373 +285,68 @@ async function sendMessage(message) {
 
     await waitTimeout(2200);
 
-    try {
-
-        //await pageManager.keyboard.type(message);
-        await pageManager.$eval('textarea[id="prompt-textarea"]', (el, value) => el.value = value, message);
-
-        await waitTimeout(1200);
-
-        await pageManager.type(
-            'textarea[id="prompt-textarea"]',
-            ' '
-        );
-
-    } catch (error) {
-        return false;
-    }
-
-    await waitTimeout(1700);
-
-    //await pageManager.keyboard.press('Enter');
-
     let pageClicked = true;
 
     try {
 
-        let submit_msg = await pageManager.$x(
-            '//*[@id="__next"]/div[1]/div[2]/main/div[2]/div[2]/div[1]/div/form/div/div[2]/div/button'
-        );
+        await pageManager.waitForSelector('[data-testid="send-button"]');
 
-        submit_msg[0].click();
+        await pageManager.evaluate(() => {
+            document.querySelector('[data-testid="send-button"]').click();
+        });
 
     } catch (error) {
-
-        try {
-
-            let submit_msg = await pageManager.$x(
-                '//*[@id="__next"]/div[1]/div/main/div[1]/div[2]/form/div/div/div/button'
-            );
-
-            submit_msg[0].click();
-
-        } catch (error) {
-
-            try {
-
-                let submit_msg = await pageManager.$x(
-                    '//*[@id="__next"]/div[1]/div[2]/main/div[2]/div[2]/form/div/div/div/button'
-                );
-
-                submit_msg[0].click();
-
-            } catch (error) {
-
-                try {
-
-                    let submit_msg = await pageManager.$x(
-                        '//*[@id="__next"]/div[1]/div[2]/main/div[1]/div[2]/div[1]/div/form/div/div[2]/div/div/button'
-                    );
-
-                    submit_msg[0].click();
-
-                } catch (error) {
-                    console.log('Fail to send message');
-                }
-
-            }
-
-        }
-
+        return false;
     }
 
     try {
 
         await pageManager.waitForSelector('.result-streaming', { timeout: 60000 });
 
-    } catch (error) {
-
-        let status_network = await checkErrorNetwork();
-
-        if (status_network === false) {
-
-            console.log('Rated limit reached, waiting 10 minutes to continue.');
-            await waitTimeout(600000);
-            await pageManager.reload();
-
-            try {
-
-                await pageManager.waitForSelector('textarea[id="prompt-textarea"]', { timeout: 30000 });
-
-                await pageManager.$eval('textarea[id="prompt-textarea"]', (el, value) => el.value = value, message);
-
-                await waitTimeout(1200);
-
-                await pageManager.type(
-                    'textarea[id="prompt-textarea"]',
-                    ' '
-                );
-
-                try {
-
-                    let submit_msg = await pageManager.$x(
-                        '//*[@id="__next"]/div[1]/div[2]/main/div[2]/div[2]/div[1]/div/form/div/div[2]/div/button'
-                    );
-
-                    submit_msg[0].click();
-
-                } catch (error) {
-
-                    try {
-
-                        let submit_msg = await pageManager.$x(
-                            '//*[@id="__next"]/div[1]/div/main/div[1]/div[2]/form/div/div/div/button'
-                        );
-
-                        submit_msg[0].click();
-
-                    } catch (error) {
-
-                        try {
-
-                            let submit_msg = await pageManager.$x(
-                                '//*[@id="__next"]/div[1]/div[2]/main/div[2]/div[2]/form/div/div/div/button'
-                            );
-
-                            submit_msg[0].click();
-
-                        } catch (error) {
-
-                            try {
-
-                                let submit_msg = await pageManager.$x(
-                                    '//*[@id="__next"]/div[1]/div[2]/main/div[1]/div[2]/div[1]/div/form/div/div[2]/div/div/button'
-                                );
-
-                                submit_msg[0].click();
-
-                            } catch (error) {
-                                console.log('Fail to send message');
-                            }
-
-                        }
-
-                    }
-
-                }
-
-            } catch (error) {
-                console.log('Fail to reload page '+error);
-                return false;
-            }
-
-        } else if (status_network === 'NO_ELEMENT') {
-
-            await pageManager.reload();
-
-            try {
-
-                await pageManager.waitForSelector('textarea[id="prompt-textarea"]', { timeout: 30000 });
-
-                await pageManager.$eval('textarea[id="prompt-textarea"]', (el, value) => el.value = value, message);
-
-                await waitTimeout(1200);
-
-                await pageManager.type(
-                    'textarea[id="prompt-textarea"]',
-                    ' '
-                );
-
-                try {
-
-                    let submit_msg = await pageManager.$x(
-                        '//*[@id="__next"]/div[1]/div[2]/main/div[2]/div[2]/div[1]/div/form/div/div[2]/div/button'
-                    );
-
-                    submit_msg[0].click();
-
-                } catch (error) {
-
-                    try {
-
-                        let submit_msg = await pageManager.$x(
-                            '//*[@id="__next"]/div[1]/div/main/div[1]/div[2]/form/div/div/div/button'
-                        );
-
-                        submit_msg[0].click();
-
-                    } catch (error) {
-
-                        try {
-
-                            let submit_msg = await pageManager.$x(
-                                '//*[@id="__next"]/div[1]/div[2]/main/div[2]/div[2]/form/div/div/div/button'
-                            );
-
-                            submit_msg[0].click();
-
-                        } catch (error) {
-
-                            try {
-
-                                let submit_msg = await pageManager.$x(
-                                    '//*[@id="__next"]/div[1]/div[2]/main/div[1]/div[2]/div[1]/div/form/div/div[2]/div/div/button'
-                                );
-
-                                submit_msg[0].click();
-
-                            } catch (error) {
-                                console.log('Fail to send message');
-                            }
-
-                        }
-
-                    }
-
-                }
-
-            } catch (error) {
-                console.log('Fail to reload page '+error);
-                return false;
-            }
-
-        }
-
-    }
-
-    let retries_network = 0;
-
-    while (true) {
-
-        try {
+        while (true) {
 
             pageClicked = await pageManager.evaluate(() => {
-                return !!document.querySelector('.result-streaming')
+                return !!document.querySelector('.result-streaming');
             });
 
-            if ( (!pageClicked) ) {
-                await waitTimeout(1300);
+            if (!pageClicked) {
                 break;
             }
 
-        } catch (error) {
-
-            if (retries_network > 2) {
-                console.log('Rated limit reached, waiting 10 minutes to continue.');
-                await waitTimeout(600000);
-            }
-
-            let status_network = await checkErrorNetwork();
-
-            if (status_network === false) {
-
-                continue;
-
-            } else if (status_network === 'NO_ELEMENT') {
-
-                await pageManager.reload();
-
-                try {
-
-                    await pageManager.waitForSelector('textarea[id="prompt-textarea"]', { timeout: 30000 });
-
-                    await pageManager.$eval('textarea[id="prompt-textarea"]', (el, value) => el.value = value, message);
-
-                    await waitTimeout(1200);
-
-                    await pageManager.type(
-                        'textarea[id="prompt-textarea"]',
-                        ' '
-                    );
-
-                    try {
-
-                        let submit_msg = await pageManager.$x(
-                            '//*[@id="__next"]/div[1]/div[2]/main/div[2]/div[2]/div[1]/div/form/div/div[2]/div/button'
-                        );
-
-                        submit_msg[0].click();
-
-                    } catch (error) {
-
-                        console.log('Fail to send message 1');
-
-                    }
-
-                    try {
-
-                        let submit_msg = await pageManager.$x(
-                            '//*[@id="__next"]/div[1]/div[2]/main/div[2]/div[2]/form/div/div[2]/div/button'
-                        );
-
-                        submit_msg[0].click();
-
-                    } catch (error) {
-
-                        try {
-
-                            let submit_msg = await pageManager.$x(
-                                '//*[@id="__next"]/div[1]/div/main/div[1]/div[2]/form/div/div/div/button'
-                            );
-
-                            submit_msg[0].click();
-
-                        } catch (error) {
-
-                            try {
-
-                                let submit_msg = await pageManager.$x(
-                                    '//*[@id="__next"]/div[1]/div[2]/main/div[2]/div[2]/form/div/div/div/button'
-                                );
-
-                                submit_msg[0].click();
-
-                            } catch (error) {
-
-                                try {
-
-                                    let submit_msg = await pageManager.$x(
-                                        '//*[@id="__next"]/div[1]/div[2]/main/div[1]/div[2]/div[1]/div/form/div/div[2]/div/div/button'
-                                    );
-
-                                    submit_msg[0].click();
-
-                                } catch (error) {
-                                    console.log('Fail to send message');
-                                }
-
-                            }
-
-                        }
-
-                    }
-
-                } catch (error) {
-                    console.log('Fail to reload page '+error);
-                    return false;
-                }
-
-            }
-
-            retries_network++;
+            await waitTimeout(1500);
 
         }
 
+        await waitTimeout(500);
+
+        const elements = await pageManager.$$('.markdown');
+
+        let elementsText = [];
+
+        for (const element of elements) {
+            const elementText = await pageManager.evaluate(
+                element => element.textContent, element
+            );
+            elementsText.push(elementText);
+        }
+
+        if (elements.length > 0) {
+            prompt_uses++;
+        }
+
+        return elementsText[elementsText.length - 1];
+
+    } catch (error) {
+        console.log(error);
+        return false;
     }
-
-    const elements = await pageManager.$$('.markdown');
-
-    let elementsText = [];
-
-    for (const element of elements) {
-        const elementText = await pageManager.evaluate(
-            element => element.textContent, element
-        );
-        elementsText.push(elementText);
-    }
-
-    if (elements.length > 0) {
-        prompt_uses++;
-    }
-
-    return elementsText[elementsText.length - 1];
 
 }
 
 async function stillLoggedIn() {
 
     try {
-        await pageManager.waitForSelector('textarea[id="prompt-textarea"]');
+        await pageManager.waitForSelector('div[id="prompt-textarea"]');
         return true;
     } catch (error) {
         return false;
@@ -749,13 +359,13 @@ async function destroy() {
     try {
         await pageManager.close();
     } catch (error) {
-        console.log('Error on destroy tab');
+        console.log('Error');
     }
 
     try {
         await browserManager.close();
     } catch (error) {
-        console.log('Error on destroy');
+        console.log('Error');
     }
 
 }
