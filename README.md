@@ -1,5 +1,5 @@
 # simple-chatgpt-wrapper
- A simple npm package to perform requests as a user on the ChatGPT page.
+ A simple npm package to perform requests automatically as a user on the ChatGPT OpenAI page.
 
 ## Install
 
