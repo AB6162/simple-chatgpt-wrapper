@@ -33,7 +33,6 @@ async function login(userName, password, headless = false) {
         }
 
     } catch (error) {
-        console.log('Error click modal');
     }
 
     await waitTimeout(1000);
@@ -114,7 +113,6 @@ async function login(userName, password, headless = false) {
         continueLogin[0].click();
 
     } catch (error) {
-        console.log('Fail to click continue 2');
     }
 
     await page.waitForSelector('input[name="password"]');
@@ -212,7 +210,6 @@ async function checkErrorNetwork() {
 
             retries++;
 
-            console.log('Probando conexión a internet');
             ping = await hasInternet();
 
             if (ping) {
