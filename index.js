@@ -94,6 +94,10 @@ async function login(userName, password, headless = false) {
 
                 await page.type('input[id="email-or-phone-input"]', userName, { delay: 150 });
 
+            } catch (error) {
+
+                return false;
+
             }
 
         }
