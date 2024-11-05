@@ -85,8 +85,17 @@ async function login(userName, password, headless = false) {
             await page.type('input[name="username"]', userName, { delay: 150 });
 
         } catch (error) {
-            console.log('Fail to type username');
-            return false;
+
+            try {
+
+                await page.waitForSelector('input[id="email-or-phone-input"]');
+
+                await page.click('input[id="email-or-phone-input"]');
+
+                await page.type('input[id="email-or-phone-input"]', userName, { delay: 150 });
+
+            }
+
         }
 
     }
