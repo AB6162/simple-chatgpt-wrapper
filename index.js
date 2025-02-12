@@ -146,9 +146,27 @@ async function login(userName, password, headless = false) {
         username = userName;
         passw = password;
         await waitTimeout(1000);
+        await checkIfExistRazon();
         return true;
     } else {
         return null;
+    }
+
+}
+
+async function checkIfExistRazon() {
+
+    try {
+        //document.querySelector("#radix-\\:rmj\\: > div > div.mb-0\\.5.flex.gap-2 > button")
+
+        await pageManager.waitForSelector('#radix-\\:rmj\\: > div > div.mb-0\\.5.flex.gap-2 > button');
+
+        await pageManager.evaluate(() => {
+            document.querySelector("#radix-\\:rmj\\: > div > div.mb-0\\.5.flex.gap-2 > button").click();
+        });
+
+    } catch (error) {
+        console.log('No razon found');
     }
 
 }
@@ -282,6 +300,8 @@ async function sendMessage(message) {
 
     try {
 
+        await checkIfExistRazon();
+
         await pageManager.evaluate((message) => {
             const element = document.getElementById('prompt-textarea');
             element.innerHTML = `<p>${message}</p>`;
@@ -299,6 +319,8 @@ async function sendMessage(message) {
 
     try {
 
+        await checkIfExistRazon();
+
         await pageManager.waitForSelector('[data-testid="send-button"]');
 
         await pageManager.evaluate(() => {
@@ -310,6 +332,8 @@ async function sendMessage(message) {
     }
 
     try {
+
+        await checkIfExistRazon();
 
         await pageManager.waitForSelector('.result-streaming', { timeout: 60000 });
 
