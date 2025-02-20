@@ -6,6 +6,7 @@ let browserManager = null;
 let username = null;
 let passw = null;
 let prompt_uses = 0;
+let last_tam = 0;
 
 async function login(userName, password, headless = false) {
 
@@ -105,10 +106,16 @@ async function login(userName, password, headless = false) {
     }
 
     try {
+        // /html/body/div/main/section/div[2]/div[1]/form/div/input
         await page.waitForSelector('button.continue-btn')
         await page.click('button.continue-btn');
     } catch (error) {
         console.log('Fail to click continue');
+        await page.waitForSelector('input.continue-btn')
+        await page.click('input.continue-btn');
+        // click xpath /html/body/div/main/section/div[2]/div[1]/form/div/input
+        //await page.waitForSelector('/html/body/div/main/section/div[2]/div[1]/form/div/input');
+        //await page.click('/html/body/div/main/section/div[2]/div[1]/form/div/input');
     }
 
     try {
@@ -168,6 +175,8 @@ async function checkIfExistRazon() {
     } catch (error) {
         console.log('No razon found');
     }
+
+    return true;
 
 }
 
@@ -335,7 +344,7 @@ async function sendMessage(message) {
 
         await checkIfExistRazon();
 
-        await pageManager.waitForSelector('.result-streaming', { timeout: 60000 });
+        await pageManager.waitForSelector('.result-streaming', { timeout: 10000 });
 
         while (true) {
 
@@ -351,6 +360,14 @@ async function sendMessage(message) {
 
         }
 
+    } catch (error) {
+
+        console.log('Error on streaming');
+
+    }
+
+    try {
+
         await waitTimeout(500);
 
         const elements = await pageManager.$$('.markdown');
@@ -364,11 +381,17 @@ async function sendMessage(message) {
             elementsText.push(elementText);
         }
 
-        if (elements.length > 0) {
+        if (elementsText.length > 0) {
             prompt_uses++;
         }
 
-        return elementsText[elementsText.length - 1];
+        if (elementsText.length > last_tam) {
+            last_tam = elementsText.length;
+            console.log('Catch new message');
+            return elementsText[elementsText.length - 1];
+        } else {
+            return false;
+        }
 
     } catch (error) {
         console.log(error);
