@@ -107,8 +107,9 @@ async function login(userName, password, headless = false) {
 
     try {
         // /html/body/div/main/section/div[2]/div[1]/form/div/input
-        await page.waitForSelector('button.continue-btn')
-        await page.click('button.continue-btn');
+        await page.waitForSelector('button[value="email"]');
+        await waitTimeout(5698);
+        await page.click('button[value="email"]');
     } catch (error) {
         console.log('Fail to click continue');
         await page.waitForSelector('input.continue-btn')
@@ -118,6 +119,7 @@ async function login(userName, password, headless = false) {
         //await page.click('/html/body/div/main/section/div[2]/div[1]/form/div/input');
     }
 
+    /*
     try {
 
         await page.waitForSelector(
@@ -134,14 +136,23 @@ async function login(userName, password, headless = false) {
 
     } catch (error) {
     }
+    */
 
     await page.waitForSelector('input[name="password"]');
 
     await page.type('input[name="password"]', password, { delay: 150 });
 
-    await page.waitForSelector('button._button-login-password[data-action-button-primary="true"]');
+    await waitTimeout(2658);
 
-    await page.click('button._button-login-password[data-action-button-primary="true"]');
+    await page.waitForSelector('xpath/.//button[text()="Continue"]');
+    const [continueButton] = await page.$$('xpath/.//button[text()="Continue"]');
+
+
+    if (continueButton) {
+        await continueButton.click();
+    } else {
+        console.log('Continue button not found');
+    }
 
     await waitTimeout(4500);
 
