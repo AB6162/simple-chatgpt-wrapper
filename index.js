@@ -46,6 +46,8 @@ async function login(userName, password) {
 
     var nextButton = await pageManager.locator('button[name="intent"][value="email"]');
 
+    await nextButton.waitFor({ timeout: 60000 });
+
     await pw.clickElement(nextButton);
 
     await pageManager.locator('input[name="current-password"]').waitFor({ timeout: 60000 });
