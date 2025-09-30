@@ -4,7 +4,7 @@ const ShyMouse = require('@ab6162/shy-mouse-playwright');
 var browser = null;
 var page = null;
 var data_dir = null;
-var shyMouse = null;
+var shyMouseController = null;
 
 const launchBrowser = async (options = {}) => {
 
@@ -140,12 +140,12 @@ const initShyMouse = () => {
 
 const clickElement = async (element, anonClick = true) => {
 
-    if (!shyMouse) {
-        shyMouse = initShyMouse();
+    if (!shyMouseController) {
+        shyMouseController = initShyMouse();
     }
 
     if (anonClick) {
-        await shyMouse.click(element);
+        await shyMouseController.click(element);
     } else {
         await element.click();
     }
@@ -154,11 +154,11 @@ const clickElement = async (element, anonClick = true) => {
 
 const moveMouse = async (options = {}) => {
 
-    if (!shyMouse) {
-        shyMouse = initShyMouse();
+    if (!shyMouseController) {
+        shyMouseController = initShyMouse();
     }
 
-    await shyMouse.move(options);
+    await shyMouseController.move(options);
 
 };
 

@@ -156,15 +156,13 @@ async function sendMessage(message) {
 
     await delay(900);
 
-    var streaming_element = await pageManager.locator('.streaming-animation');
-
-    await streaming_element.waitFor({ state: 'attached', timeout: 30000 });
-
-    await streaming_element.waitFor({ state: 'detached', timeout: 10000 });
+    await waitingStreaming();
 
     try {
 
         await delay(500);
+
+        await waitingStreaming();
 
         const elements = await pageManager.locator('.markdown').all();
 
@@ -189,6 +187,21 @@ async function sendMessage(message) {
     } catch (error) {
         console.log(error);
         return false;
+    }
+
+}
+
+async function waitingStreaming() {
+
+    try {
+
+        var streaming_element = await pageManager.locator('.streaming-animation');
+
+        await streaming_element.waitFor({ state: 'attached', timeout: 30000 });
+
+        await streaming_element.waitFor({ state: 'detached', timeout: 10000 });
+
+    } catch (error) {
     }
 
 }
