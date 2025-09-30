@@ -196,8 +196,17 @@ async function sendMessage(message) {
 async function stillLoggedIn() {
 
     try {
-        await pageManager.locator('div[id="prompt-textarea"]').waitFor({ timeout: 15000 });
-        return true;
+
+        var element = await pageManager.locator('div[id="prompt-textarea"]');
+
+        await element.waitFor({ timeout: 15000 });
+
+        if (element) {
+            return true;
+        } else {
+            return false;
+        }
+
     } catch (error) {
         return false;
     }

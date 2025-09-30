@@ -1,6 +1,6 @@
 {
   "name": "@ab6162/simple-chatgpt-wrapper",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A simple npm package to perform requests automatically as a user on the ChatGPT OpenAI page.",
   "main": "index.js",
   "repository": {
