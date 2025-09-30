@@ -23,7 +23,7 @@ async function login(userName, password) {
     await delay(1800);
 
     try {
-        var status_login = stillLoggedIn();
+        var status_login = await stillLoggedIn();
 
         if (status_login) {
             return true;
