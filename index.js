@@ -171,8 +171,20 @@ async function sendMessage(message) {
         let elementsText = [];
 
         for (const element of elements) {
+
             const elementText = await element.textContent();  // Método directo en Locator
+
+            //test if elementText contains this: Something went wrong while generating the response.
+
+            if (elementText.includes('Something went wrong while generating the response.')) {
+                console.log('Error: Something went wrong while generating the response.');
+                console.log('Try again in 1 minute.');
+                await pageManager.reload();
+                return false;
+            }
+
             elementsText.push(elementText);
+
         }
 
         if (elementsText.length > 0) {
