@@ -68,8 +68,6 @@ async function login(userName, password) {
     var codeInput = await pageManager.locator('input[name="code"]');
     await codeInput.waitFor({ timeout: 15000 });
 
-    console.log(codeInput);
-
     if (codeInput) {
 
         var code = await input('Enter the code sent to your email: ');
@@ -166,34 +164,40 @@ async function sendMessage(message) {
 
         await waitingStreaming();
 
-        const elements = await pageManager.locator('.markdown').all();
+        await delay(1500);
 
-        let elementsText = [];
+        var { count, lastText } = await pageManager.evaluate(() => {
 
-        for (const element of elements) {
+            const elements = document.querySelectorAll('.markdown');
+            const count = elements.length;
 
-            const elementText = await element.textContent();  // Método directo en Locator
+            if (count === 0) {
+                return { count: 0, lastText: null };
+            }
 
-            //test if elementText contains this: Something went wrong while generating the response.
+            // Obtener el último elemento
+            const lastElement = elements[elements.length - 1];
+            let text = lastElement.textContent.trim();
 
-            if (elementText.includes('Something went wrong while generating the response.')) {
+            return { count, lastText: text };
+
+        });
+
+        if (count > last_tam) {
+
+            if (lastText.includes('Something went wrong while generating the response.')) {
+
                 console.log('Error: Something went wrong while generating the response.');
                 console.log('Try again in 1 minute.');
                 await pageManager.reload();
                 return false;
+
             }
 
-            elementsText.push(elementText);
-
-        }
-
-        if (elementsText.length > 0) {
             prompt_uses++;
-        }
+            last_tam = count;
+            return lastText;
 
-        if (elementsText.length > last_tam) {
-            last_tam = elementsText.length;
-            return elementsText[elementsText.length - 1];
         } else {
             return false;
         }
