@@ -114,6 +114,8 @@ async function sendMessage(message) {
 
         await pageManager.reload();
 
+        await delay(1600);
+
         try {
 
             await pageManager.locator('div[id="prompt-textarea"]').waitFor({ timeout: 120000 });
@@ -124,6 +126,18 @@ async function sendMessage(message) {
             console.log('Fail to reload page '+error);
             return false;
         }
+
+    }
+
+    try {
+
+        var close_btn_popup = await pageManager.getByTestId('close-button');
+
+        await close_btn_popup.waitFor({ timeout: 2000 });
+
+        await pw.clickElement(close_btn_popup, false);
+
+    } catch (error) {
 
     }
 
