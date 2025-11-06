@@ -138,7 +138,6 @@ async function sendMessage(message) {
         await pw.clickElement(close_btn_popup, false);
 
     } catch (error) {
-
     }
 
     try {
@@ -165,6 +164,7 @@ async function sendMessage(message) {
         await pw.clickElement(sendButton);
 
     } catch (error) {
+        console.log('Error clicking send button:', error);
         return false;
     }
 
@@ -197,9 +197,6 @@ async function sendMessage(message) {
 
         });
 
-        console.log('Responses received: ' + count);
-        console.log('Last response text: ' + lastText);
-
         if (count > last_tam) {
 
             if (lastText.includes('Something went wrong while generating the response.')) {
@@ -216,6 +213,7 @@ async function sendMessage(message) {
             return lastText;
 
         } else {
+            console.log('No new responses received.');
             return false;
         }
 
