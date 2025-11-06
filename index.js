@@ -110,11 +110,11 @@ const input = async (prompt) => {
 
 async function sendMessage(message) {
 
-    if (prompt_uses >= 50) {
+    if (prompt_uses >= 10) {
 
         await pageManager.reload();
 
-        await delay(1600);
+        await delay(1900);
 
         try {
 
@@ -178,7 +178,7 @@ async function sendMessage(message) {
 
         await waitingStreaming();
 
-        await delay(1500);
+        await delay(2500);
 
         var { count, lastText } = await pageManager.evaluate(() => {
 
@@ -193,9 +193,12 @@ async function sendMessage(message) {
             const lastElement = elements[elements.length - 1];
             let text = lastElement.textContent.trim();
 
-            return { count, lastText: text };
+            return { count: count, lastText: text };
 
         });
+
+        console.log('Responses received: ' + count);
+        console.log('Last response text: ' + lastText);
 
         if (count > last_tam) {
 
