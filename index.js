@@ -174,10 +174,6 @@ async function sendMessage(message) {
 
     try {
 
-        await delay(500);
-
-        await waitingStreaming();
-
         await delay(2500);
 
         var { count, lastText } = await pageManager.evaluate(() => {
@@ -225,18 +221,52 @@ async function sendMessage(message) {
 }
 
 async function waitingStreaming() {
+    const STREAMING_TIMEOUT = 90 * 1000; // Total timeout for streaming to finish (e.g., 90 seconds)
+    const ATTACHED_TIMEOUT = 30 * 1000; // Initial wait for attached
+    const DETACHED_CHECK_TIMEOUT = 10 * 1000; // How long to wait for each detachment check
+    const FINAL_DETACHED_DELAY = 500; // Small delay to confirm detachment
 
     try {
+        const streaming_locator = pageManager.locator('.streaming-animation');
 
-        var streaming_element = await pageManager.locator('.streaming-animation');
+        // Wait for the streaming animation to appear, indicating streaming has started.
+        await streaming_locator.waitFor({ state: 'attached', timeout: ATTACHED_TIMEOUT });
 
-        await streaming_element.waitFor({ state: 'attached', timeout: 30000 });
+        const startTime = Date.now();
+        let isStreaming = true;
 
-        await streaming_element.waitFor({ state: 'detached', timeout: 10000 });
+        while (isStreaming && (Date.now() - startTime < STREAMING_TIMEOUT)) {
+            try {
+                // Wait for it to detach (disappear).
+                // If it reappears quickly, this will re-throw (timeout) and keep the loop going.
+                await streaming_locator.waitFor({ state: 'detached', timeout: DETACHED_CHECK_TIMEOUT });
+
+                // Add a small delay after detachment to ensure it's truly finished and not just a flicker
+                await delay(FINAL_DETACHED_DELAY);
+
+                // After the delay, check if it's still detached.
+                // If it re-attached, `isVisibleAfterDelay` will be true, and the loop continues.
+                const isVisibleAfterDelay = await streaming_locator.isVisible();
+                if (!isVisibleAfterDelay) {
+                    isStreaming = false; // It stayed detached, so streaming is likely complete.
+                }
+            } catch (e) {
+                // If waitFor({ state: 'detached' }) timed out, it means the element is still attached or reappeared.
+                // We just continue the loop to check again, as long as the STREAMING_TIMEOUT hasn't passed.
+                console.log('Streaming animation still present or reappeared, retrying...');
+            }
+        }
+
+        if (isStreaming) {
+            console.log('Warning: Streaming did not complete within the allotted time.');
+            // Optionally, throw an error or handle this case more explicitly if it's a critical failure.
+        }
 
     } catch (error) {
+        // If the initial attached waitFor times out, it means streaming never started, which might be an error condition
+        // or a race condition where streaming finished before we could detect it.
+        console.log('Error in waitingStreaming (initial attachment or general error): ', error);
     }
-
 }
 
 async function stillLoggedIn() {

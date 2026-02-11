@@ -1,6 +1,6 @@
 {
   "name": "@ab6162/simple-chatgpt-wrapper",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "A simple npm package to perform requests automatically as a user on the ChatGPT OpenAI page.",
   "main": "index.js",
   "repository": {
@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "patchright": "^1.56.1",
-    "@ab6162/shy-mouse-playwright": "^0.0.8"
+    "@ab6162/shy-mouse-playwright": "^0.0.9"
   },
   "author": "AB6162",
   "license": "MIT",
